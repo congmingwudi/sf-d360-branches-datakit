@@ -6,7 +6,15 @@ contains:
 - a **File Upload (CSV) data stream** → **DLO** `branch_offices_seedcsv` → mapped to a custom
   **DMO** `Branch Office` (`Branch_Office__dlm`)
 - the `UploadedFiles` connection it depends on
+- a **calculated insight**, *Branch Footprint by Region* (`branch_footprint_by_region`): office
+  count per region and country
 - a 50-row fictional seed file: [`data/branch-offices-seed.csv`](data/branch-offices-seed.csv)
+
+> **Moving it through a Lifecycle Center (DevOps Center) pipeline?** See
+> [`data360-lifecycle-center-devops`](https://github.com/congmingwudi/data360-lifecycle-center-devops) for the tested runbook,
+> scripts and walkthrough deck: committing this kit to a work item, promoting it Development →
+> Staging → Production, and the post-install steps in each org. This repo is the standalone kit you
+> can deploy directly with the `sf` CLI.
 
 The kit was built in a sandbox as **Data Kit Type = DevOps** (`dataKitType = SANDBOX`) in the
 **`default`** data space. It was retrieved by following Salesforce's
@@ -20,13 +28,14 @@ The kit was built in a sandbox as **Data Kit Type = DevOps** (`dataKitType = SAN
 
 | Path | What |
 |---|---|
-| `manifest/package.xml` | The kit's manifest: 33 members across 12 metadata types |
+| `manifest/package.xml` | The kit's manifest: 35 members across 12 metadata types |
 | `force-app/main/default/dataPackageKitDefinitions/` | The kit itself (`branch_offices_datakit`) |
 | `force-app/main/default/DataPackageKitObjects/` | Kit membership records |
 | `force-app/main/default/dataSourceBundleDefinitions/`, `dataStreamTemplates/`, `dataSourceObjects/` | The data stream bundle and its DLO |
 | `force-app/main/default/dataKitObjectTemplates/`, `dataKitObjectDependencies/`, `mktDataSources/` | The `UploadedFiles` connection pieces |
 | `force-app/main/default/objects/Branch_Office__dlm/` | The custom DMO and its fields |
 | `force-app/main/default/dataSrcDataModelFieldMaps/` | DLO → DMO field mappings |
+| `force-app/main/default/dataCalcInsightTemplates/` | The *Branch Footprint by Region* calculated insight |
 | `data/branch-offices-seed.csv` | Seed data (`OfficeCode,OfficeName,Region,State,Country,OpenedDate`) |
 
 **Modifications from the raw retrieve:**
@@ -35,7 +44,7 @@ The kit was built in a sandbox as **Data Kit Type = DevOps** (`dataKitType = SAN
 2. Source-org identifiers (user name, user ID, connection record ID) in the `UploadedFiles` template
    and the data stream template were **replaced with placeholders** (`Redacted User`,
    `005000000000000AAA`, `9cg000000000000AAA`). The redacted source still validates: a check-only
-   deploy succeeded with **33/33 components, 0 errors**.
+   deploy succeeded with **35/35 components, 0 errors** (2026-10-27).
 
 ## Prerequisites (target org)
 
@@ -70,9 +79,14 @@ in each target:
    Inactive, then redeploy if components didn't link.
 2. **Data Cloud Setup → Data Kits → `branch offices datakit`:** confirm the stream bundle, data model,
    and connection are listed.
-3. **Create or activate the data stream** from the kit, then **upload `data/branch-offices-seed.csv`**
-   to ingest the 50 rows.
-4. **Verify:** in **Data Explorer**, open the `Branch Office` DMO in the `default` data space and
+3. **Deploy the kit's components.** The metadata deploy installs the kit but doesn't create the
+   stream, DLO, mappings or calculated insight. Open the kit and click **Deploy**, or run
+   [`deploy-datakit-components.sh`](https://github.com/congmingwudi/data360-lifecycle-center-devops/blob/main/scripts/deploy-datakit-components.sh)
+   from the Lifecycle Center repo. The data stream arrives inactive.
+4. **Upload `data/branch-offices-seed.csv`** with the stream's **Update File** to activate it and
+   ingest the 50 rows.
+5. **Run the calculated insight** *Branch Footprint by Region* once so it has data.
+6. **Verify:** in **Data Explorer**, open the `Branch Office` DMO in the `default` data space and
    check that the rows appear.
 
 ## Troubleshooting (from the Salesforce doc)

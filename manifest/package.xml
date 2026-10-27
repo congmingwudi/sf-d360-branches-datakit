@@ -19,6 +19,10 @@
         <name>CustomObject</name>
     </types>
     <types>
+        <members>branch_footprint_by_region</members>
+        <name>DataCalcInsightTemplate</name>
+    </types>
+    <types>
         <members>UploadedFiles1</members>
         <members>branch_offices_seedcsv</members>
         <name>DataKitObjectDependency</name>
@@ -37,6 +41,7 @@
         <members>branch_offices_datakit_1790638961076</members>
         <members>branch_offices_datakit_1790638961398</members>
         <members>branch_offices_datakit_1790638962238</members>
+        <members>branch_offices_datakit_1793109364717</members>
         <name>DataPackageKitObject</name>
     </types>
     <types>
